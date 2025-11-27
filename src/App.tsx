@@ -11,7 +11,11 @@ type CyoaStoryNode = {
 };
 
 type CyoaGame = {
-  metadata: unknown;
+  metadata: {
+    title: string;
+    author: string;
+    version: string;
+  };
   content: Record<string, CyoaStoryNode>;
 };
 
@@ -50,9 +54,19 @@ function Topbar({ setGame }: { setGame: React.Dispatch<unknown> }) {
   );
 }
 
-function BodyText({ text }: { text: string }) {
+function GameInfo({ title, author }: { title: string; author: string }) {
+  return (
+    <>
+      <h1>{title}</h1>
+      <p>by {author}</p>
+    </>
+  );
+}
+
+function BodyText({ text, section }: { text: string; section: string }) {
   return (
     <div id="body-text">
+      {section ? <h2>{section}</h2> : ""}
       <p>{text}</p>
     </div>
   );
@@ -61,9 +75,11 @@ function BodyText({ text }: { text: string }) {
 function ChoiceList({
   choices,
   setCurrentNode,
+  setCurrentSection,
 }: {
   choices: CyoaChoice[];
   setCurrentNode: React.Dispatch<React.SetStateAction<string>>;
+  setCurrentSection: React.Dispatch<React.SetStateAction<string>>;
 }) {
   const choiceList = choices.map((choice, i) => (
     <button
@@ -71,6 +87,7 @@ function ChoiceList({
       key={i}
       onClick={() => {
         setCurrentNode(choice.next);
+        setCurrentSection(choice.content);
       }}
     >
       {choice.content}
@@ -83,16 +100,22 @@ function ChoiceList({
 export default function App() {
   const [game, setGame] = useState<CyoaGame>(null);
   const [currentNode, setCurrentNode] = useState("start");
+  const [currentSection, setCurrentSection] = useState("");
 
   return (
     <>
       <Topbar setGame={setGame} />
       {game ? (
         <>
-          <BodyText text={game.content[currentNode].content} />
+          <GameInfo title={game.metadata.title} author={game.metadata.author} />
+          <BodyText
+            text={game.content[currentNode].content}
+            section={currentSection}
+          />
           <ChoiceList
             choices={game.content[currentNode].choices}
             setCurrentNode={setCurrentNode}
+            setCurrentSection={setCurrentSection}
           />
         </>
       ) : (
