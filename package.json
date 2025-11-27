@@ -1,8 +1,8 @@
 {
-  "name": "ts-react-template",
+  "name": "local-cyoa",
   "private": true,
   "version": "0.0.0",
-  "description": "Typescript React Template",
+  "description": "Local CYOA (Choose Your Own Adventure)",
   "license": "MIT",
   "author": "Seth Hoong",
   "type": "module",
