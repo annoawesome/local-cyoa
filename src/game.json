@@ -6,8 +6,17 @@
     },
     "content": {
         "start": {
-            "content": "Once upon a time there was a kingdom.",
-            "choices": []
+            "content": "Once upon a time there was a kingdom. You are a knight who has accomplished great feats, and today you are visiting the castle where the king resides. Hopefully, you will be rewarded with lands and granted a noble title.",
+            "choices": [
+                {
+                    "content": "Enter the castle",
+                    "next": "intro_1"
+                },
+                {
+                    "content": "The reward can wait. Explore the surrounding city",
+                    "next": "city_1"
+                }
+            ]
         }
     }
 }
