@@ -5,6 +5,13 @@ type ItemAmount = {
   amount: number;
 };
 
+type GameStateCondition = {
+  type: string;
+  item?: string;
+  min?: number;
+  max?: number;
+};
+
 type CyoaChoiceAction = {
   [index: string]: unknown;
   type: string;
@@ -15,6 +22,7 @@ type CyoaChoiceActionModifyItem = CyoaChoiceAction & ItemAmount;
 type CyoaChoice = {
   content: string;
   next: string;
+  requirements: GameStateCondition[];
   actions: CyoaChoiceAction[];
 };
 
@@ -117,18 +125,43 @@ function onSelectChoice(
   gameState: CyoaGameState,
   setGameState: React.Dispatch<React.SetStateAction<CyoaGameState>>,
 ) {
-  for (const action of choice.actions) {
-    if (action.type === "AddItem") {
-      choiceActionAddItem(
-        action as CyoaChoiceActionModifyItem,
-        gameState,
-        setGameState,
-      );
+  if (choice.actions) {
+    for (const action of choice.actions) {
+      if (action.type === "AddItem") {
+        choiceActionAddItem(
+          action as CyoaChoiceActionModifyItem,
+          gameState,
+          setGameState,
+        );
+      }
     }
   }
 
   setCurrentNode(choice.next);
   setCurrentSection(choice.content);
+}
+
+function gameStateSatisfiesCondition(
+  gameState: CyoaGameState,
+  condition: GameStateCondition,
+) {
+  if (condition.type === "ItemCount") {
+    const itemName = condition.item;
+    const itemState = gameState.inventory[itemName] || {
+      item: itemName,
+      amount: 0,
+    };
+
+    if (itemState) {
+      return (
+        (typeof condition.min === "number" &&
+          condition.min <= itemState.amount) ||
+        (typeof condition.max === "number" && condition.max >= itemState.amount)
+      );
+    }
+  }
+
+  return false;
 }
 
 function ChoiceList({
@@ -144,6 +177,18 @@ function ChoiceList({
   gameState: CyoaGameState;
   setGameState: React.Dispatch<React.SetStateAction<CyoaGameState>>;
 }) {
+  choices = choices.filter((choice) => {
+    if (choice.requirements) {
+      for (const condition of choice.requirements) {
+        if (!gameStateSatisfiesCondition(gameState, condition)) {
+          return false;
+        }
+      }
+    }
+
+    return true;
+  });
+
   const choiceList = choices.map((choice, i) => (
     <button
       className="btn-choice"
