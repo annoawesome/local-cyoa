@@ -237,23 +237,39 @@ export default function App() {
     });
   };
 
+  const node = game && game.content[currentNode];
+
   return (
     <>
       <Topbar setGame={setGame} resetGameState={resetGameState} />
       {game ? (
         <>
           <GameInfo title={game.metadata.title} author={game.metadata.author} />
-          <BodyText
-            text={game.content[currentNode].content}
-            section={currentSection}
-          />
-          <ChoiceList
-            choices={game.content[currentNode].choices}
-            setCurrentNode={setCurrentNode}
-            setCurrentSection={setCurrentSection}
-            gameState={gameState}
-            setGameState={setGameState}
-          />
+          {node ? (
+            <>
+              <BodyText
+                text={game.content[currentNode].content}
+                section={currentSection}
+              />
+              <ChoiceList
+                choices={game.content[currentNode].choices}
+                setCurrentNode={setCurrentNode}
+                setCurrentSection={setCurrentSection}
+                gameState={gameState}
+                setGameState={setGameState}
+              />
+            </>
+          ) : (
+            <>
+              <h2 className="width-slim margin-auto">Oops!</h2>
+              <p className="width-slim margin-auto">
+                Sorry, but there is no content here. Either this is intentional
+                and you have reached the end of the story, or the author forgot
+                to fill in this section. Please reload the adventure to start
+                again.
+              </p>
+            </>
+          )}
         </>
       ) : (
         <>
