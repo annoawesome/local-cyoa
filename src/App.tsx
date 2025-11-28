@@ -56,16 +56,18 @@ function Topbar({ setGame }: { setGame: React.Dispatch<unknown> }) {
 
 function GameInfo({ title, author }: { title: string; author: string }) {
   return (
-    <>
-      <h1>{title}</h1>
-      <p>by {author}</p>
-    </>
+    <div className="width-slim margin-auto">
+      <h1 id="game-title">{title}</h1>
+      <p id="game-author" className="text-secondary">
+        by {author}
+      </p>
+    </div>
   );
 }
 
 function BodyText({ text, section }: { text: string; section: string }) {
   return (
-    <div id="body-text">
+    <div id="body-text" className="width-slim margin-auto">
       {section ? <h2>{section}</h2> : ""}
       <p>{text}</p>
     </div>
@@ -94,7 +96,11 @@ function ChoiceList({
     </button>
   ));
 
-  return choiceList;
+  return (
+    <div className="width-slim margin-auto flex-column gap-16px">
+      {choiceList}
+    </div>
+  );
 }
 
 export default function App() {
