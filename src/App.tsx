@@ -1,8 +1,21 @@
 import React, { useState } from "react";
 
+type ItemAmount = {
+  item: string;
+  amount: number;
+};
+
+type CyoaChoiceAction = {
+  [index: string]: unknown;
+  type: string;
+};
+
+type CyoaChoiceActionModifyItem = CyoaChoiceAction & ItemAmount;
+
 type CyoaChoice = {
   content: string;
   next: string;
+  actions: CyoaChoiceAction[];
 };
 
 type CyoaStoryNode = {
@@ -17,6 +30,10 @@ type CyoaGame = {
     version: string;
   };
   content: Record<string, CyoaStoryNode>;
+};
+
+type CyoaGameState = {
+  inventory: Record<string, ItemAmount>;
 };
 
 function Topbar({ setGame }: { setGame: React.Dispatch<unknown> }) {
@@ -74,22 +91,71 @@ function BodyText({ text, section }: { text: string; section: string }) {
   );
 }
 
+function choiceActionAddItem(
+  choice: CyoaChoiceActionModifyItem,
+  gameState: CyoaGameState,
+  setGameState: React.Dispatch<React.SetStateAction<CyoaGameState>>,
+) {
+  const updatedGameState = { ...gameState };
+
+  if (!updatedGameState.inventory[choice.item]) {
+    updatedGameState.inventory[choice.item] = {
+      item: choice.item,
+      amount: !choice.amount && choice.amount === 0 ? 0 : 1, // if no amount is specified, add one of the item
+    };
+  } else {
+    updatedGameState.inventory[choice.item].amount += choice.amount;
+  }
+
+  setGameState(updatedGameState);
+}
+
+function onSelectChoice(
+  choice: CyoaChoice,
+  setCurrentNode: React.Dispatch<React.SetStateAction<string>>,
+  setCurrentSection: React.Dispatch<React.SetStateAction<string>>,
+  gameState: CyoaGameState,
+  setGameState: React.Dispatch<React.SetStateAction<CyoaGameState>>,
+) {
+  for (const action of choice.actions) {
+    if (action.type === "AddItem") {
+      choiceActionAddItem(
+        action as CyoaChoiceActionModifyItem,
+        gameState,
+        setGameState,
+      );
+    }
+  }
+
+  setCurrentNode(choice.next);
+  setCurrentSection(choice.content);
+}
+
 function ChoiceList({
   choices,
   setCurrentNode,
   setCurrentSection,
+  gameState,
+  setGameState,
 }: {
   choices: CyoaChoice[];
   setCurrentNode: React.Dispatch<React.SetStateAction<string>>;
   setCurrentSection: React.Dispatch<React.SetStateAction<string>>;
+  gameState: CyoaGameState;
+  setGameState: React.Dispatch<React.SetStateAction<CyoaGameState>>;
 }) {
   const choiceList = choices.map((choice, i) => (
     <button
       className="btn-choice"
       key={i}
       onClick={() => {
-        setCurrentNode(choice.next);
-        setCurrentSection(choice.content);
+        onSelectChoice(
+          choice,
+          setCurrentNode,
+          setCurrentSection,
+          gameState,
+          setGameState,
+        );
       }}
     >
       {choice.content}
@@ -107,6 +173,9 @@ export default function App() {
   const [game, setGame] = useState<CyoaGame>(null);
   const [currentNode, setCurrentNode] = useState("start");
   const [currentSection, setCurrentSection] = useState("");
+  const [gameState, setGameState] = useState<CyoaGameState>({
+    inventory: {},
+  });
 
   return (
     <>
@@ -122,6 +191,8 @@ export default function App() {
             choices={game.content[currentNode].choices}
             setCurrentNode={setCurrentNode}
             setCurrentSection={setCurrentSection}
+            gameState={gameState}
+            setGameState={setGameState}
           />
         </>
       ) : (
