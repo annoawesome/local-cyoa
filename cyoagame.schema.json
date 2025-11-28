@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "LocalCYOA Game File",
+  "description": "Data detailing a Choose Your Own Adventure (CYOA) game",
+  "type": "object",
+  "properties": {
+    "metadata": {
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "author": { "type": "string" },
+        "version": { "type": "string" }
+      },
+      "required": ["title", "author", "version"]
+    },
+    "content": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "content": { "type": "string" },
+          "choices": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "content": { "type": "string" },
+                "next": { "type": "string" }
+              },
+              "required": ["content", "next"]
+            }
+          }
+        },
+        "required": ["content", "choices"]
+      }
+    }
+  }
+}
