@@ -44,7 +44,13 @@ type CyoaGameState = {
   inventory: Record<string, ItemAmount>;
 };
 
-function Topbar({ setGame }: { setGame: React.Dispatch<unknown> }) {
+function Topbar({
+  setGame,
+  resetGameState,
+}: {
+  setGame: React.Dispatch<unknown>;
+  resetGameState: () => void;
+}) {
   const [file, setFile] = useState<File>(null);
 
   return (
@@ -69,6 +75,7 @@ function Topbar({ setGame }: { setGame: React.Dispatch<unknown> }) {
             file.text().then((text) => {
               const json = JSON.parse(text);
               setGame(json);
+              resetGameState();
             });
           }
         }}
@@ -222,9 +229,17 @@ export default function App() {
     inventory: {},
   });
 
+  const resetGameState = () => {
+    setCurrentNode("start");
+    setCurrentSection("");
+    setGameState({
+      inventory: {},
+    });
+  };
+
   return (
     <>
-      <Topbar setGame={setGame} />
+      <Topbar setGame={setGame} resetGameState={resetGameState} />
       {game ? (
         <>
           <GameInfo title={game.metadata.title} author={game.metadata.author} />
