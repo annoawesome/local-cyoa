@@ -84,7 +84,7 @@
       },
       "required": ["title", "author", "version"]
     },
-    "content": {
+    "nodes": {
       "type": "object",
       "additionalProperties": {
         "type": "object",

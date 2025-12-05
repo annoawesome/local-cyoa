@@ -43,7 +43,7 @@ type CyoaGame = {
     author: string;
     version: string;
   };
-  content: Record<string, CyoaStoryNode>;
+  nodes: Record<string, CyoaStoryNode>;
 };
 
 type CyoaGameState = {
@@ -268,7 +268,7 @@ export default function App() {
     });
   };
 
-  const node = game && game.content[currentNode];
+  const node = game && game.nodes[currentNode];
 
   return (
     <>
@@ -279,11 +279,11 @@ export default function App() {
           {node ? (
             <>
               <BodyText
-                text={game.content[currentNode].content}
+                text={game.nodes[currentNode].content}
                 section={currentSection}
               />
               <ChoiceList
-                choices={game.content[currentNode].choices}
+                choices={game.nodes[currentNode].choices}
                 setCurrentNode={setCurrentNode}
                 setCurrentSection={setCurrentSection}
                 gameState={gameState}
