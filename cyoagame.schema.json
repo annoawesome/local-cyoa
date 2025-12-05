@@ -1,23 +1,36 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "title": "LocalCYOA Game File",
-  "description": "Data detailing a Choose Your Own Adventure (CYOA) game",
+  "description": "Data detailing a Choose Your Own Adventure (CYOA) game.",
   "type": "object",
   "$defs": {
     "choice": {
       "type": "object",
+      "description": "A choice that the player can choose to progress the story.",
       "properties": {
-        "content": { "type": "string" },
-        "next": { "type": "string" },
+        "content": {
+          "type": "string",
+          "description": "The name of the choice to show to the user."
+        },
+        "next": {
+          "type": "string",
+          "description": "The name of the next node to use if this choice is selected."
+        },
         "requirements": {
           "type": "array",
+          "description": "A list of conditions the player must fulfill to be able to select this choice.",
           "minItems": 1,
           "items": {
             "$ref": "#/$defs/condition"
           }
         },
+        "hidden": {
+          "type": "boolean",
+          "description": "Whether the choice is hidden unless the requirements are fulfilled."
+        },
         "actions": {
           "type": "array",
+          "description": "A list of actions to perform when the choice is chosen.",
           "items": {
             "$ref": "#/$defs/choiceAction"
           },
@@ -28,16 +41,26 @@
     },
     "choiceAction": {
       "type": "object",
+      "description": "An action to update the game save state.",
       "properties": {
-        "type": { "type": "string" }
+        "type": {
+          "type": "string",
+          "description": "The type of action to perform."
+        }
       },
       "anyOf": [
         {
           "type": "object",
           "properties": {
             "type": { "const": "AddItem" },
-            "item": { "type": "string" },
-            "amount": { "type": "number" }
+            "item": {
+              "type": "string",
+              "description": "The name of the item to add."
+            },
+            "amount": {
+              "type": "number",
+              "description": "The amount added to the players inventory. This number can be negative to remove items instead."
+            }
           },
           "required": ["type", "item"]
         }
@@ -45,25 +68,38 @@
     },
     "condition": {
       "type": "object",
+      "description": "A condition that can either be true or false.",
       "properties": {
-        "type": { "type": "string" }
+        "type": {
+          "type": "string",
+          "description": "The type of the condition."
+        }
       },
       "anyOf": [
         {
           "properties": {
             "type": { "const": "ItemCount" },
-            "item": { "type": "string" }
+            "item": {
+              "type": "string",
+              "description": "The name of the item to check."
+            }
           },
           "anyOf": [
             {
               "properties": {
-                "min": { "type": "number" }
+                "min": {
+                  "type": "number",
+                  "description": "The minimum amount of item needed, inclusive."
+                }
               },
               "required": ["min"]
             },
             {
               "properties": {
-                "max": { "type": "number" }
+                "max": {
+                  "type": "number",
+                  "description": "The maximum amount of item needed, inclusive."
+                }
               },
               "required": ["max"]
             }
@@ -77,21 +113,37 @@
   "properties": {
     "metadata": {
       "type": "object",
+      "description": "The metadata of the game data file.",
       "properties": {
-        "title": { "type": "string" },
-        "author": { "type": "string" },
-        "version": { "type": "string" }
+        "title": {
+          "type": "string",
+          "description": "The title of the CYOA game."
+        },
+        "author": {
+          "type": "string",
+          "description": "The author of the CYOA game."
+        },
+        "version": {
+          "type": "string",
+          "description": "The format version of the game data file."
+        }
       },
       "required": ["title", "author", "version"]
     },
     "nodes": {
       "type": "object",
+      "description": "A list of story nodes.",
       "additionalProperties": {
         "type": "object",
+        "description": "A story node, containing text to show to the player and a list of choices.",
         "properties": {
-          "content": { "type": "string" },
+          "content": {
+            "type": "string",
+            "description": "The main body of text to show to the player."
+          },
           "choices": {
             "type": "array",
+            "description": "A list of possible choices the player can choose.",
             "items": {
               "$ref": "#/$defs/choice"
             }
