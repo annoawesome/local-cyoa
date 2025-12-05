@@ -16,6 +16,11 @@ input::file-selector-button {
   color: rgb(200, 200, 200);
 }
 
+button:disabled {
+  color: rgb(128, 128, 128);
+  background-color: rgb(16, 16, 16);
+}
+
 .margin-auto {
   margin: auto;
 }

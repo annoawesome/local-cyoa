@@ -22,8 +22,14 @@ type CyoaChoiceActionModifyItem = CyoaChoiceAction & ItemAmount;
 type CyoaChoice = {
   content: string;
   next: string;
+  hidden?: boolean;
   requirements: GameStateCondition[];
   actions: CyoaChoiceAction[];
+};
+
+type CyoaChoiceDisplayState = {
+  choice: CyoaChoice;
+  unavailable: boolean;
 };
 
 type CyoaStoryNode = {
@@ -187,7 +193,10 @@ function ChoiceList({
   choices = choices.filter((choice) => {
     if (choice.requirements) {
       for (const condition of choice.requirements) {
-        if (!gameStateSatisfiesCondition(gameState, condition)) {
+        if (
+          !gameStateSatisfiesCondition(gameState, condition) &&
+          choice.hidden
+        ) {
           return false;
         }
       }
@@ -196,23 +205,45 @@ function ChoiceList({
     return true;
   });
 
-  const choiceList = choices.map((choice, i) => (
-    <button
-      className="btn-choice"
-      key={i}
-      onClick={() => {
-        onSelectChoice(
-          choice,
-          setCurrentNode,
-          setCurrentSection,
-          gameState,
-          setGameState,
-        );
-      }}
-    >
-      {choice.content}
-    </button>
-  ));
+  const choiceDisplayStates = choices.map((choice) => {
+    const choiceDisplayState: CyoaChoiceDisplayState = {
+      choice: choice,
+      unavailable: false,
+    };
+
+    if (choice.requirements) {
+      for (const condition of choice.requirements) {
+        if (!gameStateSatisfiesCondition(gameState, condition)) {
+          choiceDisplayState.unavailable = true;
+          break;
+        }
+      }
+    }
+
+    return choiceDisplayState;
+  });
+
+  const choiceList = choiceDisplayStates.map((choiceDisplayState, i) => {
+    const choice = choiceDisplayState.choice;
+    return (
+      <button
+        className="btn-choice"
+        key={i}
+        disabled={choiceDisplayState.unavailable}
+        onClick={() => {
+          onSelectChoice(
+            choice,
+            setCurrentNode,
+            setCurrentSection,
+            gameState,
+            setGameState,
+          );
+        }}
+      >
+        {choice.content}
+      </button>
+    );
+  });
 
   return (
     <div className="width-slim margin-auto flex-column gap-16px">
