@@ -27,6 +27,9 @@ type CyoaChoice = {
   actions: CyoaChoiceAction[];
 };
 
+/**
+ * Information on how a choice should be shown to the player
+ */
 type CyoaChoiceDisplayState = {
   choice: CyoaChoice;
   unavailable: boolean;
@@ -46,6 +49,9 @@ type CyoaGame = {
   nodes: Record<string, CyoaStoryNode>;
 };
 
+/**
+ * The player's game state.
+ */
 type CyoaGameState = {
   inventory: Record<string, ItemAmount>;
 };
@@ -59,33 +65,31 @@ function Topbar({
 }) {
   const [file, setFile] = useState<File>(null);
 
+  const onChangeFile = (ev: React.ChangeEvent<HTMLInputElement>) => {
+    const selectedFile = ev.target.files[0];
+
+    if (selectedFile) {
+      setFile(selectedFile);
+    }
+  };
+
+  const onClickLoadAdventure = () => {
+    if (!file) {
+      return;
+    }
+
+    // TODO: Handle situation where file cannot be parsed as JSON
+    file.text().then((text) => {
+      const json = JSON.parse(text);
+      setGame(json);
+      resetGameState();
+    });
+  };
+
   return (
     <nav id="topbar">
-      <input
-        type="file"
-        name=""
-        id=""
-        accept=".json"
-        onChange={(ev) => {
-          const selectedFile = ev.target.files[0];
-
-          if (selectedFile) {
-            setFile(selectedFile);
-          }
-        }}
-      />
-      <button
-        type="button"
-        onClick={() => {
-          if (file) {
-            file.text().then((text) => {
-              const json = JSON.parse(text);
-              setGame(json);
-              resetGameState();
-            });
-          }
-        }}
-      >
+      <input type="file" name="" id="" accept=".json" onChange={onChangeFile} />
+      <button type="button" onClick={onClickLoadAdventure}>
         Load Adventure
       </button>
     </nav>
@@ -177,6 +181,23 @@ function gameStateSatisfiesCondition(
   return false;
 }
 
+function gameStateSatisfiesConditions(
+  gameState: CyoaGameState,
+  conditions: GameStateCondition[],
+) {
+  if (!conditions) {
+    return true;
+  }
+
+  for (const condition of conditions) {
+    if (!gameStateSatisfiesCondition(gameState, condition)) {
+      return false;
+    }
+  }
+
+  return true;
+}
+
 function ChoiceList({
   choices,
   setCurrentNode,
@@ -190,20 +211,11 @@ function ChoiceList({
   gameState: CyoaGameState;
   setGameState: React.Dispatch<React.SetStateAction<CyoaGameState>>;
 }) {
-  choices = choices.filter((choice) => {
-    if (choice.requirements) {
-      for (const condition of choice.requirements) {
-        if (
-          !gameStateSatisfiesCondition(gameState, condition) &&
-          choice.hidden
-        ) {
-          return false;
-        }
-      }
-    }
-
-    return true;
-  });
+  choices = choices.filter(
+    (choice) =>
+      gameStateSatisfiesConditions(gameState, choice.requirements) ||
+      !choice.hidden,
+  );
 
   const choiceDisplayStates = choices.map((choice) => {
     const choiceDisplayState: CyoaChoiceDisplayState = {
@@ -211,13 +223,8 @@ function ChoiceList({
       unavailable: false,
     };
 
-    if (choice.requirements) {
-      for (const condition of choice.requirements) {
-        if (!gameStateSatisfiesCondition(gameState, condition)) {
-          choiceDisplayState.unavailable = true;
-          break;
-        }
-      }
+    if (!gameStateSatisfiesConditions(gameState, choice.requirements)) {
+      choiceDisplayState.unavailable = true;
     }
 
     return choiceDisplayState;
@@ -225,6 +232,7 @@ function ChoiceList({
 
   const choiceList = choiceDisplayStates.map((choiceDisplayState, i) => {
     const choice = choiceDisplayState.choice;
+
     return (
       <button
         className="btn-choice"
