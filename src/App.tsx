@@ -108,10 +108,14 @@ function GameInfo({ title, author }: { title: string; author: string }) {
 }
 
 function BodyText({ text, section }: { text: string; section: string }) {
+  const content = text
+    .split("\n")
+    .map((paragraph, i) => <p key={i}>{paragraph}</p>);
+
   return (
     <div id="body-text" className="width-slim margin-auto">
       {section ? <h2>{section}</h2> : ""}
-      <p>{text}</p>
+      {content}
     </div>
   );
 }
