@@ -9,7 +9,7 @@
   "scripts": {
     "build": "vite build",
     "watch": "vite build --watch",
-    "preview": "vite preview"
+    "preview": "vite preview --host"
   },
   "dependencies": {
     "react": "^19.1.1",
