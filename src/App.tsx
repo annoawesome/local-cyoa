@@ -7,10 +7,21 @@ type ItemAmount = {
 
 type GameStateCondition = {
   type: string;
-  item?: string;
+};
+
+type GameStateConditionItemCountRange = GameStateCondition & {
+  type: "ItemCount";
+  item: string;
   min?: number;
   max?: number;
 };
+
+// Pray that the author didn't mess it up and not include the other required properties
+function isItemCountRangeCondition(
+  condition: GameStateCondition,
+): condition is GameStateConditionItemCountRange {
+  return condition.type === "ItemCount";
+}
 
 type CyoaChoiceAction = {
   [index: string]: unknown;
@@ -171,7 +182,7 @@ function gameStateSatisfiesCondition(
   gameState: CyoaGameState,
   condition: GameStateCondition,
 ) {
-  if (condition.type === "ItemCount") {
+  if (isItemCountRangeCondition(condition)) {
     const itemName = condition.item;
     const itemState = gameState.inventory[itemName] || {
       item: itemName,
