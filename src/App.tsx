@@ -60,12 +60,17 @@ function Topbar({
   setGame,
   resetGameState,
 }: {
-  setGame: React.Dispatch<unknown>;
+  setGame: React.Dispatch<React.SetStateAction<CyoaGame | null>>;
   resetGameState: () => void;
 }) {
-  const [file, setFile] = useState<File>(null);
+  const [file, setFile] = useState<File | null>(null);
 
   const onChangeFile = (ev: React.ChangeEvent<HTMLInputElement>) => {
+    // This should never happen!
+    if (!ev.target.files) {
+      return;
+    }
+
     const selectedFile = ev.target.files[0];
 
     if (selectedFile) {
@@ -265,7 +270,7 @@ function ChoiceList({
 }
 
 export default function App() {
-  const [game, setGame] = useState<CyoaGame>(null);
+  const [game, setGame] = useState<CyoaGame | null>(null);
   const [currentNode, setCurrentNode] = useState("start");
   const [currentSection, setCurrentSection] = useState("");
   const [gameState, setGameState] = useState<CyoaGameState>({
