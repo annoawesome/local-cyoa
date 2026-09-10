@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import { applyChoiceActions } from "./actions.js";
 import { gameStateSatisfiesConditions } from "./conditions.js";
 
+import textJson from "./text.json" with { type: "json" };
+
 import type { CyoaChoice, CyoaGame, CyoaGameState } from "./gameTypes.js";
 import { getEmptyGameState } from "./gameState.js";
 
@@ -198,13 +200,14 @@ export default function App() {
             </>
           ) : (
             <>
-              <h2 className="width-slim margin-auto">Oops!</h2>
+              {/* <h2 className="width-slim margin-auto">Oops!</h2>
               <p className="width-slim margin-auto">
                 Sorry, but there is no content here. Either this is intentional
                 and you have reached the end of the story, or the author forgot
                 to fill in this section. Please reload the adventure to start
                 again.
-              </p>
+              </p> */}
+              <BodyText text={textJson.NonexistentNode} section="Oops!" />
             </>
           )}
         </>
