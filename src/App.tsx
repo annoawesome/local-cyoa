@@ -2,13 +2,16 @@ import React, { useState } from "react";
 import { applyChoiceActions } from "./actions.js";
 import { gameStateSatisfiesConditions } from "./conditions.js";
 
-import type {
-  CyoaChoice,
-  CyoaChoiceDisplayState,
-  CyoaGame,
-  CyoaGameState,
-} from "./gameTypes.js";
+import type { CyoaChoice, CyoaGame, CyoaGameState } from "./gameTypes.js";
 import { getEmptyGameState } from "./gameState.js";
+
+/**
+ * Information on how a choice should be shown to the player
+ */
+export type CyoaChoiceDisplayState = {
+  choice: CyoaChoice;
+  unavailable: boolean;
+};
 
 function Topbar({
   setGame,

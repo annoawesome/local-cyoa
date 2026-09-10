@@ -46,14 +46,6 @@ export type CyoaChoice = {
   actions: CyoaChoiceAction[];
 };
 
-/**
- * Information on how a choice should be shown to the player
- */
-export type CyoaChoiceDisplayState = {
-  choice: CyoaChoice;
-  unavailable: boolean;
-};
-
 export type CyoaStoryNode = {
   content: string;
   choices: CyoaChoice[];
