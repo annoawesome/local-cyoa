@@ -1,11 +1,11 @@
-import React, { useState } from "react";
-import { applyChoiceActions } from "./actions.js";
-import { gameStateSatisfiesConditions } from "./conditions.js";
+import type { CyoaChoice, CyoaGame, CyoaGameState } from "./game/gameTypes.js";
 
 import textJson from "./text.json" with { type: "json" };
 
-import type { CyoaChoice, CyoaGame, CyoaGameState } from "./gameTypes.js";
-import { getEmptyGameState } from "./gameState.js";
+import React, { useState } from "react";
+import { applyChoiceActions } from "./game/actions.js";
+import { gameStateSatisfiesConditions } from "./game/conditions.js";
+import { getEmptyGameState } from "./game/gameState.js";
 
 /**
  * Information on how a choice should be shown to the player
