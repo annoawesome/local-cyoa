@@ -8,6 +8,7 @@ import type {
   CyoaGame,
   CyoaGameState,
 } from "./gameTypes.js";
+import { getEmptyGameState } from "./gameState.js";
 
 function Topbar({
   setGame,
@@ -161,16 +162,13 @@ export default function App() {
   const [game, setGame] = useState<CyoaGame | null>(null);
   const [currentNode, setCurrentNode] = useState("start");
   const [currentSection, setCurrentSection] = useState("");
-  const [gameState, setGameState] = useState<CyoaGameState>({
-    inventory: {},
-  });
+  const [gameState, setGameState] =
+    useState<CyoaGameState>(getEmptyGameState());
 
   const resetGameState = () => {
     setCurrentNode("start");
     setCurrentSection("");
-    setGameState({
-      inventory: {},
-    });
+    setGameState(getEmptyGameState());
   };
 
   const node = game && game.nodes[currentNode];
