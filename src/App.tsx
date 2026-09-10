@@ -1,34 +1,14 @@
 import React, { useState } from "react";
-
-type ItemAmount = {
-  item: string;
-  amount: number;
-};
-
-type GameStateCondition = {
-  type: string;
-};
-
-type GameStateConditionItemCountRange = GameStateCondition & {
-  type: "ItemCount";
-  item: string;
-  min?: number;
-  max?: number;
-};
-
-// Pray that the author didn't mess it up and not include the other required properties
-function isItemCountRangeCondition(
-  condition: GameStateCondition,
-): condition is GameStateConditionItemCountRange {
-  return condition.type === "ItemCount";
-}
-
-type CyoaChoiceAction = {
-  [index: string]: unknown;
-  type: string;
-};
-
-type CyoaChoiceActionModifyItem = CyoaChoiceAction & ItemAmount;
+import {
+  choiceActionAddItem,
+  CyoaChoiceAction,
+  CyoaChoiceActionModifyItem,
+} from "./actions.js";
+import { CyoaGameState } from "./gameState.js";
+import {
+  GameStateCondition,
+  gameStateSatisfiesConditions,
+} from "./conditions.js";
 
 type CyoaChoice = {
   content: string;
@@ -58,13 +38,6 @@ type CyoaGame = {
     version: string;
   };
   nodes: Record<string, CyoaStoryNode>;
-};
-
-/**
- * The player's game state.
- */
-type CyoaGameState = {
-  inventory: Record<string, ItemAmount>;
 };
 
 function Topbar({
@@ -136,25 +109,6 @@ function BodyText({ text, section }: { text: string; section: string }) {
   );
 }
 
-function choiceActionAddItem(
-  choice: CyoaChoiceActionModifyItem,
-  gameState: CyoaGameState,
-  setGameState: React.Dispatch<React.SetStateAction<CyoaGameState>>,
-) {
-  const updatedGameState = { ...gameState };
-
-  if (!updatedGameState.inventory[choice.item]) {
-    updatedGameState.inventory[choice.item] = {
-      item: choice.item,
-      amount: !choice.amount && choice.amount === 0 ? 0 : 1, // if no amount is specified, add one of the item
-    };
-  } else {
-    updatedGameState.inventory[choice.item].amount += choice.amount;
-  }
-
-  setGameState(updatedGameState);
-}
-
 function onSelectChoice(
   choice: CyoaChoice,
   setCurrentNode: React.Dispatch<React.SetStateAction<string>>,
@@ -176,46 +130,6 @@ function onSelectChoice(
 
   setCurrentNode(choice.next);
   setCurrentSection(choice.content);
-}
-
-function gameStateSatisfiesCondition(
-  gameState: CyoaGameState,
-  condition: GameStateCondition,
-) {
-  if (isItemCountRangeCondition(condition)) {
-    const itemName = condition.item;
-    const itemState = gameState.inventory[itemName] || {
-      item: itemName,
-      amount: 0,
-    };
-
-    if (itemState) {
-      return (
-        (typeof condition.min === "number" &&
-          condition.min <= itemState.amount) ||
-        (typeof condition.max === "number" && condition.max >= itemState.amount)
-      );
-    }
-  }
-
-  return false;
-}
-
-function gameStateSatisfiesConditions(
-  gameState: CyoaGameState,
-  conditions: GameStateCondition[],
-) {
-  if (!conditions) {
-    return true;
-  }
-
-  for (const condition of conditions) {
-    if (!gameStateSatisfiesCondition(gameState, condition)) {
-      return false;
-    }
-  }
-
-  return true;
 }
 
 function ChoiceList({
