@@ -1,64 +1,11 @@
-import type { CyoaChoice, CyoaGame, CyoaGameState } from "./game/gameTypes.js";
+import type { CyoaGame, CyoaGameState } from "./game/gameTypes.js";
 
 import textJson from "./text.json" with { type: "json" };
 
 import React, { useState } from "react";
-import { applyChoiceActions } from "./game/actions.js";
-import { gameStateSatisfiesConditions } from "./game/conditions.js";
 import { getEmptyGameState } from "./game/gameState.js";
-
-/**
- * Information on how a choice should be shown to the player
- */
-export type CyoaChoiceDisplayState = {
-  choice: CyoaChoice;
-  unavailable: boolean;
-};
-
-function Topbar({
-  setGame,
-  resetGameState,
-}: {
-  setGame: React.Dispatch<React.SetStateAction<CyoaGame | null>>;
-  resetGameState: () => void;
-}) {
-  const [file, setFile] = useState<File | null>(null);
-
-  const onChangeFile = (ev: React.ChangeEvent<HTMLInputElement>) => {
-    // This should never happen!
-    if (!ev.target.files) {
-      return;
-    }
-
-    const selectedFile = ev.target.files[0];
-
-    if (selectedFile) {
-      setFile(selectedFile);
-    }
-  };
-
-  const onClickLoadAdventure = () => {
-    if (!file) {
-      return;
-    }
-
-    // TODO: Handle situation where file cannot be parsed as JSON
-    file.text().then((text) => {
-      const json = JSON.parse(text);
-      setGame(json);
-      resetGameState();
-    });
-  };
-
-  return (
-    <nav id="topbar">
-      <input type="file" name="" id="" accept=".json" onChange={onChangeFile} />
-      <button type="button" onClick={onClickLoadAdventure}>
-        Load Adventure
-      </button>
-    </nav>
-  );
-}
+import ChoiceList from "./component/ChoiceList.js";
+import Topbar from "./component/Topbar.js";
 
 function GameInfo({ title, author }: { title: string; author: string }) {
   return (
@@ -80,85 +27,6 @@ function BodyText({ text, section }: { text: string; section: string }) {
     <div id="body-text" className="width-slim margin-auto">
       {section ? <h2>{section}</h2> : ""}
       {content}
-    </div>
-  );
-}
-
-function onSelectChoice(
-  choice: CyoaChoice,
-  setCurrentNode: React.Dispatch<React.SetStateAction<string>>,
-  setCurrentSection: React.Dispatch<React.SetStateAction<string>>,
-  gameState: CyoaGameState,
-  setGameState: React.Dispatch<React.SetStateAction<CyoaGameState>>,
-) {
-  const updatedGameState = applyChoiceActions(choice, gameState);
-
-  if (updatedGameState) {
-    setGameState(updatedGameState);
-  }
-
-  setCurrentNode(choice.next);
-  setCurrentSection(choice.content);
-}
-
-function ChoiceList({
-  choices,
-  setCurrentNode,
-  setCurrentSection,
-  gameState,
-  setGameState,
-}: {
-  choices: CyoaChoice[];
-  setCurrentNode: React.Dispatch<React.SetStateAction<string>>;
-  setCurrentSection: React.Dispatch<React.SetStateAction<string>>;
-  gameState: CyoaGameState;
-  setGameState: React.Dispatch<React.SetStateAction<CyoaGameState>>;
-}) {
-  choices = choices.filter(
-    (choice) =>
-      gameStateSatisfiesConditions(gameState, choice.requirements) ||
-      !choice.hidden,
-  );
-
-  const choiceDisplayStates = choices.map((choice) => {
-    const choiceDisplayState: CyoaChoiceDisplayState = {
-      choice: choice,
-      unavailable: false,
-    };
-
-    if (!gameStateSatisfiesConditions(gameState, choice.requirements)) {
-      choiceDisplayState.unavailable = true;
-    }
-
-    return choiceDisplayState;
-  });
-
-  const choiceList = choiceDisplayStates.map((choiceDisplayState, i) => {
-    const choice = choiceDisplayState.choice;
-
-    return (
-      <button
-        className="btn-choice"
-        key={i}
-        disabled={choiceDisplayState.unavailable}
-        onClick={() => {
-          onSelectChoice(
-            choice,
-            setCurrentNode,
-            setCurrentSection,
-            gameState,
-            setGameState,
-          );
-        }}
-      >
-        {choice.content}
-      </button>
-    );
-  });
-
-  return (
-    <div className="width-slim margin-auto flex-column gap-16px">
-      {choiceList}
     </div>
   );
 }
