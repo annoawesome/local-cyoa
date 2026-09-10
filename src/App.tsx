@@ -200,13 +200,6 @@ export default function App() {
             </>
           ) : (
             <>
-              {/* <h2 className="width-slim margin-auto">Oops!</h2>
-              <p className="width-slim margin-auto">
-                Sorry, but there is no content here. Either this is intentional
-                and you have reached the end of the story, or the author forgot
-                to fill in this section. Please reload the adventure to start
-                again.
-              </p> */}
               <BodyText text={textJson.NonexistentNode} section="Oops!" />
             </>
           )}
