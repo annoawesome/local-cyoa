@@ -1,44 +1,14 @@
 import React, { useState } from "react";
-import {
-  choiceActionAddItem,
-  CyoaChoiceAction,
+import { choiceActionAddItem } from "./actions.js";
+import { gameStateSatisfiesConditions } from "./conditions.js";
+
+import type {
+  CyoaChoice,
   CyoaChoiceActionModifyItem,
-} from "./actions.js";
-import { CyoaGameState } from "./gameState.js";
-import {
-  GameStateCondition,
-  gameStateSatisfiesConditions,
-} from "./conditions.js";
-
-type CyoaChoice = {
-  content: string;
-  next: string;
-  hidden?: boolean;
-  requirements: GameStateCondition[];
-  actions: CyoaChoiceAction[];
-};
-
-/**
- * Information on how a choice should be shown to the player
- */
-type CyoaChoiceDisplayState = {
-  choice: CyoaChoice;
-  unavailable: boolean;
-};
-
-type CyoaStoryNode = {
-  content: string;
-  choices: CyoaChoice[];
-};
-
-type CyoaGame = {
-  metadata: {
-    title: string;
-    author: string;
-    version: string;
-  };
-  nodes: Record<string, CyoaStoryNode>;
-};
+  CyoaChoiceDisplayState,
+  CyoaGame,
+  CyoaGameState,
+} from "./gameTypes.js";
 
 function Topbar({
   setGame,

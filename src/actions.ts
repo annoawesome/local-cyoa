@@ -1,11 +1,4 @@
-import { CyoaGameState, ItemAmount } from "./gameState.js";
-
-export type CyoaChoiceAction = {
-  [index: string]: unknown;
-  type: string;
-};
-
-export type CyoaChoiceActionModifyItem = CyoaChoiceAction & ItemAmount;
+import { CyoaChoiceActionModifyItem, CyoaGameState } from "./gameTypes.js";
 
 export function choiceActionAddItem(
   choice: CyoaChoiceActionModifyItem,

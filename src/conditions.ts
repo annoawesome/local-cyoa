@@ -1,15 +1,8 @@
-import { CyoaGameState } from "./gameState.js";
-
-export type GameStateCondition = {
-  type: string;
-};
-
-export type GameStateConditionItemCountRange = GameStateCondition & {
-  type: "ItemCount";
-  item: string;
-  min?: number;
-  max?: number;
-};
+import {
+  CyoaGameState,
+  GameStateCondition,
+  GameStateConditionItemCountRange,
+} from "./gameTypes.js";
 
 // Pray that the author didn't mess it up and not include the other required properties
 export function isItemCountRangeCondition(
