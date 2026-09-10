@@ -1,10 +1,9 @@
 import React, { useState } from "react";
-import { choiceActionAddItem } from "./actions.js";
+import { applyChoiceActions } from "./actions.js";
 import { gameStateSatisfiesConditions } from "./conditions.js";
 
 import type {
   CyoaChoice,
-  CyoaChoiceActionModifyItem,
   CyoaChoiceDisplayState,
   CyoaGame,
   CyoaGameState,
@@ -86,16 +85,10 @@ function onSelectChoice(
   gameState: CyoaGameState,
   setGameState: React.Dispatch<React.SetStateAction<CyoaGameState>>,
 ) {
-  if (choice.actions) {
-    for (const action of choice.actions) {
-      if (action.type === "AddItem") {
-        choiceActionAddItem(
-          action as CyoaChoiceActionModifyItem,
-          gameState,
-          setGameState,
-        );
-      }
-    }
+  const updatedGameState = applyChoiceActions(choice, gameState);
+
+  if (updatedGameState) {
+    setGameState(updatedGameState);
   }
 
   setCurrentNode(choice.next);

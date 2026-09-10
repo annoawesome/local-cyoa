@@ -1,9 +1,12 @@
-import { CyoaChoiceActionModifyItem, CyoaGameState } from "./gameTypes.js";
+import {
+  CyoaChoice,
+  CyoaChoiceActionModifyItem,
+  CyoaGameState,
+} from "./gameTypes.js";
 
 export function choiceActionAddItem(
   choice: CyoaChoiceActionModifyItem,
   gameState: CyoaGameState,
-  setGameState: React.Dispatch<React.SetStateAction<CyoaGameState>>,
 ) {
   const updatedGameState = { ...gameState };
 
@@ -16,5 +19,25 @@ export function choiceActionAddItem(
     updatedGameState.inventory[choice.item].amount += choice.amount;
   }
 
-  setGameState(updatedGameState);
+  return updatedGameState;
+}
+
+export function applyChoiceActions(
+  choice: CyoaChoice,
+  gameState: CyoaGameState,
+) {
+  if (choice.actions) {
+    let updatedGameState = gameState;
+
+    for (const action of choice.actions) {
+      if (action.type === "AddItem") {
+        updatedGameState = choiceActionAddItem(
+          action as CyoaChoiceActionModifyItem,
+          updatedGameState,
+        );
+      }
+    }
+
+    return updatedGameState;
+  }
 }
