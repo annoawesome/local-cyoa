@@ -4,6 +4,8 @@ import type {
   CyoaGameState,
 } from "./gameTypes.js";
 
+import { getEmptyGameState } from "./gameState.js";
+
 export function choiceActionAddItem(
   choice: CyoaChoiceActionModifyItem,
   gameState: CyoaGameState,
@@ -35,6 +37,12 @@ export function applyChoiceActions(
           action as CyoaChoiceActionModifyItem,
           updatedGameState,
         );
+      } else if (action.type === "ResetGame") {
+        updatedGameState = getEmptyGameState();
+
+        // Prevent next actions if they exist from applying
+        // Ideally this is the only action listed if it exists
+        break;
       }
     }
 

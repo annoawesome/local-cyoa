@@ -63,6 +63,13 @@
             }
           },
           "required": ["type", "item"]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": { "const": "ResetGame" }
+          },
+          "required": ["type"]
         }
       ]
     },
